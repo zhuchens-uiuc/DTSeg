@@ -1,0 +1,92 @@
+General:
+    comment: 
+    seed: 2023
+    fp16: True
+    amp_level: O2
+    precision: 16 
+    multi_gpu_mode: dp
+    gpus: [0]
+    epochs: &epoch 200 
+    grad_acc: 2
+    frozen_bn: False
+    patience: 30
+    server: test #train #test
+    log_path: logs/
+
+Data:
+    dataset_name: featuretsbase_data
+    label_dir: /data111/shaozc/SegDiff/SegDiff/dataset_csv/monusac.csv
+    image_size: 256
+    dim:
+      - 256
+      - 256
+      - 6048
+    upsample_mode: bilinear
+    label_ratio: 0.05
+
+    feature_extractor:
+        steps:
+          - 50
+          - 150
+          - 250
+        blocks:
+          - 7
+          - 8
+          - 9
+        model_path: /data111/shaozc/SegDiff/latent-diffusion-main/logs/2023-04-30T16-27-36_big/checkpoints/epoch=000159.ckpt
+        model_config: /data111/shaozc/SegDiff/latent-diffusion-main/configs/latent-diffusion/big.yaml
+        input_activations: False
+        
+    train_dataloader:
+        batch_size: 5 
+        num_workers: 8
+
+    test_dataloader:
+        batch_size: 5
+        num_workers: 8
+
+Model:
+    name: AggregrateWSA
+    num_class: 5
+    feature_channels: 384
+    image_channels: 128
+    decode_channels: 128
+
+Model_Feature:
+    name: UNetFormer
+    num_class: 5
+    image_size: 256
+    pretrained: /data111/shaozc/SegDiff/SegDiff/logs/scripts/monusac/UNetFormer_0.05_789_aug_big/epoch=66-val_IoU=0.6681.ckpt
+    encoder_channels:
+        - 1344
+        - 1344
+        - 672
+    scale_factor:
+        - 1
+        - 2
+        - 1
+    resize_factor:
+        - 8
+        - 4
+        - 4
+    decode_channels: 128
+    block_number: 3
+
+
+Model_Image:
+    name: FPN
+    num_class: 5
+    pretrained: /data111/shaozc/SegDiff/SegDiff/logs/scripts/monusac/FPN_0.05_aug/epoch=76-val_IoU=0.6252.ckpt
+
+Optimizer:
+    opt: lookahead_radam
+    lr: 0.0005 # small learning rate
+    opt_eps: null 
+    opt_betas: null
+    momentum: null 
+    weight_decay: 0.00001
+
+
+Loss:
+    base_loss: dice
+
