@@ -1,10 +1,8 @@
-# 忽略 macOS 生成的文件夹
+
 __MACOSX/
 
-# 忽略所有以 MA 或 ma 开头的文件或文件夹
 [Mm][Aa]*
 
-# 其他常用忽略规则
 .DS_Store
 *.pyc
 __pycache__/
